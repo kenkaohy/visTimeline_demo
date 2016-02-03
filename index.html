@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.7.0/moment.min.js"></script>
+    
+    <!--vis timeline -->
+    <script src="js/node_modules/vis/dist/vis.min.js"></script>
+    <link href="js/node_modules/vis/dist/vis.min.css" rel="stylesheet" type="text/css" />
+
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: 'https://raw.githubusercontent.com/kenkaohy/json/master/timeline',
+                type: 'GET',
+                dataType: 'json',
+                data: {format: 'json'},
+                success: function(data) {
+                  s buildTimeline(data);
+                }
+            });
+        });
+        
+        function buildTimeline(result) {
+            // Create an empty DataSet.
+            var items = new vis.DataSet();
+            items.clear();
+            // create a timeline
+            var container = document.getElementById('visualization');
+            var options = {
+                  editable: false
+                };
+            var timeline = new vis.Timeline(container, items, options);
+
+//            timeline.on('select', function (properties) {
+//                console.log('select: ' + properties['items'])
+//            });
+
+            //console.log(result);
+            console.log(result);
+            var tlData = [];          
+            $.each(result,function(i,o){
+                var los = o['LOS'];
+                var node = {};
+                var content, startDT, endDT;      
+
+                if ( los != null) {
+                    content = 'Outpatient';
+                    startDT = moment(o['ADMITDATE']);
+                    endDT = moment(startDT).add(10, 'days')
+                }else{
+                   startDT = moment(o['SERVICEDATE']);
+                   content = 'Inpatient';
+                }; 
+                    
+                //popolator timeline data          
+                node['id']=i;
+                node['content'] = content;
+                node['start'] = startDT;
+                if (los != null){
+                    node['end']= moment(o['DISCHARGEDATE']);
+                }
+
+                tlData.push(node);
+                
+            })
+            console.log(tlData);
+            items.add(tlData);
+            timeline.fit();
+
+            //var timeline = new vis.Timeline(container, items, options);
+            timeline.on('select', function (properties ) {
+                console.log('select: ' + properties['items'])
+                console.log(result[properties['items']]);
+            });
+
+        }
+
+    </script>
+</head>
+<body>
+
+<div id="visualization"></div>
+
+</body>
+</html>
