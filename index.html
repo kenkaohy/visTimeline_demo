@@ -11,6 +11,7 @@
     <link href="js/node_modules/vis/dist/vis.min.css" rel="stylesheet" type="text/css" />
     <link href="./style.css" rel="stylesheet" type="text/css" />
     <script>
+        //retrive sample data
         $(document).ready(function() {
             $.ajax({
                 url: 'https://raw.githubusercontent.com/kenkaohy/json/master/timeline',
@@ -29,6 +30,7 @@
             items.clear();
             // create a timeline
             var container = document.getElementById('visualization');
+            //timeline configration
             var options = {
                   editable: false,
                   zoomMin: 100*60*60*24*30,
@@ -73,15 +75,18 @@
                 console.log(result[properties['items']]);
             });
             // attach events to the navigation buttons
-            $( '#zoomIn').click(function() {
-                zoom(-0.4, timeline);
-            });
-            $( '#zoomOut').click(function() {
-                zoom(+0.4, timeline);
-            });
+            // $( '#zoomIn').click(function() {
+            //     zoom(-0.4, timeline);
+            // });
+            // $( '#zoomOut').click(function() {
+            //     zoom(+0.4, timeline);
+            // });
             $( '#annualview').click(function() {
                 annualview(timeline);
             });
+            $( '#monthlyview').click(function() {
+                monthlyview(timeline);
+            });            
             $( '#fitview').click(function() {
                 fitview(timeline);
             });            
@@ -115,24 +120,32 @@
                 end:   range.end.valueOf()   + interval * percentage
             });
         }
-
+        //set timeline to annual view
         function annualview (tl) {
             var today = new Date;
             var pastyear = new Date().setYear(today.getFullYear()-1);
             tl.setWindow(pastyear, today, {animation: true});
         }
+        //set timeline to monthly view
+        function monthlyview (tl) {
+            var today = new Date;
+            var pastmonth = new Date().setDate(today.getDay()-30);
+            tl.setWindow(pastmonth, today, {animation: true});
+        }        
+        //refit timeline for all items
         function fitview (tl) {
-            tl.fit();
+            tl.fit( {animation: true});
         }
     </script>
 </head>
 <body>
 
 <div id="visualization">
-    <div class="menu">
-        <input type="button" id = "zoomIn" value="Zoom in">
-        <input type="button" id = "zoomOut" value="Zoom out">
+    <div class="timelinemenu">
+        <!--<input type="button" id = "zoomIn" value="Zoom in">-->
+
         <input type="button" id = "annualview" value="Annual View">
+        <input type="button" id = "monthlyview" value="Monthly View">        
         <input type="button" id = "fitview" value="Fit view">
     </div>
 </div>
